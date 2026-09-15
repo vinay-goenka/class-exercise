@@ -2,6 +2,7 @@ import argparse
 import csv
 import sys
 from pathlib import Path
+import logging
 
 
 def check_data(filename):
@@ -43,8 +44,6 @@ parser.add_argument(
     help="Show detailed DEBUG messages"
     )
 
-args = parser.parse_args()
-
 p = Path(args.input)
 if not p.is_file():
     print(f"File not found: '{args.input}'")
@@ -59,3 +58,21 @@ with open(args.output, "w") as f:
     f.write(f"Number of columns: {len(header)}\n")
     f.write(f"Number of rows with missing values: {len(missing_rows)}\n")
 
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%H:%M:%S"
+    )
+# Create a module-level logger
+logger = logging.getLogger(__name__)
+
+args = parser.parse_args()
+if args.verbose:
+    logger.setLevel(logging.DEBUG)
+
+logger.debug(f"Arguments parsed: filename={args.input}")
+    
+logger.info(f"File validated: '{args.input}'")
+
+logger.debug(f"Loading data from: '{args.input}'")
