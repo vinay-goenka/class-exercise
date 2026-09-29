@@ -3,3 +3,5 @@
 *.md
 .env
 !requirements.txt
+*.json
+*.yaml
