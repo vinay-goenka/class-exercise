@@ -4,12 +4,18 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+import DataFrame as df
 
 from class6_7_netflix_utils import (
     drop_missing_rows,
     remove_duplicates,
     show_overview,
+    clean_text,
+    remove_iqr_outliers
+    
 )
+
+df_original = df.copy()
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +71,7 @@ def main():
     logger.info(f"Duplicates removed. New shape: {df.shape}")
     df = drop_missing_rows(df)
     logger.info(f"Missing rows dropped. New shape: {df.shape}")
+
 
 
 if __name__ == "__main__":
