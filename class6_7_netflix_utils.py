@@ -71,15 +71,15 @@ def remove_iqr_outliers(df, column, threshold):
     if column not in df.columns:
         logger.error(f"Column '{column}' does not exist")
         raise ValueError(f"Column '{column}' does not exist")
-        q1 = df[column].quantile(0.25)
-        q3 = df[column].quantile(0.75)
-        iqr = q3 - q1
-        lower_bound = q1 - threshold * iqr
-        upper_bound = q3 + threshold * iqr
-        before = len(df)
-        df = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
-        after = len(df)
-        logger.debug(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}. Rows removed: {before - after}")
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    lower = q1 - threshold * iqr
+    upper = q3 + threshold * iqr
+    before = len(df)
+    df = df[(df[column]>=lower) & (df[column]<=upper)]
+    after = len(df)
+    logger.debug(f"Lower bound: {lower}, Upper bound: {upper}. Rows removed: {before - after}")
 
     # TODO 3:
     # Inside a try block, remove runtime_minutes outliers
