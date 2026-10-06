@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import sys
 from class8_src import load_netflix, require_columns
 
 
@@ -23,9 +24,9 @@ def main():
         df = require_columns(df, ["title", "type", "release_year"])
     except ValueError as e:
         logger.error(f"Data validation error: {e}")
-        exit(1)
+        sys.exit(1)
     
-    logger.info(f"Data loaded and validated successfully. Shape: {df.shape}")
+    logger.info(f"Data loaded and validated successfully")
 
 
 if __name__ == "__main__":
