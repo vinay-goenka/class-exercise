@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
-from class8_data_loader import load_netflix
-from class8_data_validator import require_columns
+from class8_src import load_netflix, require_columns
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -18,9 +18,15 @@ def main():
     # Load the data and require columns: ["title", "type", "release_year"].
     # Catch ValueError and exit with status code 1.
     # Log an INFO
-    pass
+    try:
+        df = load_netflix(input_path)
+        df = require_columns(df, ["title", "type", "release_year"])
+    except ValueError as e:
+        logger.error(f"Data validation error: {e}")
+        exit(1)
+    
+    logger.info(f"Data loaded and validated successfully. Shape: {df.shape}")
 
 
 if __name__ == "__main__":
     main()
-    

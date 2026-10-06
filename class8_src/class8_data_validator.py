@@ -9,4 +9,9 @@ def require_columns(df, required_columns):
     # If any are missing, log an ERROR and raise ValueError.
     # Log an INFO.
     # Return the DataFrame.
-    pass
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        logger.error(f"Missing required columns: {missing_columns}")
+        raise ValueError(f"Missing required columns: {missing_columns}")
+    logger.info(f"All columns present: {required_columns}")
+    return df
