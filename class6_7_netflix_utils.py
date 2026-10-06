@@ -17,6 +17,8 @@ def show_overview(df):
     print(df.columns)
     print(df.dtypes)
 
+#what does df.head do?
+#the
 
 def remove_duplicates(df):
     """Remove exact duplicate rows."""
