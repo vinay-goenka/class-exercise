@@ -5,6 +5,8 @@ from class12_14.src.models import CSVInfo, MovieInput
 from class12_14.src import MovieResponse
 from class12_14.src.storage import DataStorage
 from pathlib import Path
+from src import ProcessConfig
+import pandas as pd
 
 app = FastAPI(title="Movie API")
 
@@ -133,3 +135,12 @@ def get_dataset_shape(dataset_id: int):
         "columns": df.shape[1]
     }
 
+@app.post("/demo/process-config")
+def demo_process_config(config: ProcessConfig):
+    df = pd.DataFrame({"title": ["Movie A", "Movie A", "Movie B", None]})
+    settings = config.model_dump()
+
+    if settings["processing"]["remove_duplicates"]:
+        df = df.drop_duplicates()
+        
+    return {"rows": len(df)}
