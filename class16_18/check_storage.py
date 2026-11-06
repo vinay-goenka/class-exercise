@@ -102,10 +102,9 @@ class BookStorage:
             # Fetch all matching rows and return a list of dictionaries.
             # Log the returned row count at DEBUG.
             sql_statement = """
-            SELECT id, title, price 
+            SELECT *
             FROM books 
-            WHERE price >= ? 
-            AND price <= ? 
+            WHERE price >= ? AND price <= ? 
             ORDER BY price DESC, id ASC
             """
             rows = connection.execute(sql_statement, (min_price, max_price)).fetchall()
