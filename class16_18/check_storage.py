@@ -12,7 +12,23 @@ logger = logging.getLogger(__name__)
 
 class BookStorage:
     def __init__(self, db_path="data/books.db"):
-        self.db_path = db_path
+        self.db_path = Path(db_path)
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        connection = sqlite3.connect(self.db_path)
+        try:
+            sql_statement = """
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY,
+                title TEXT NOT NULL,
+                price REAL NOT NULL
+            )
+            """
+            connection.execute(sql_statement)
+            connection.commit()
+            logger.debug(f"Database ready: {self.db_path}")
+        finally:
+            connection.close()
+  
 
     def add_book(self, title, price):
         connection = sqlite3.connect(self.db_path)
@@ -50,12 +66,54 @@ class BookStorage:
         connection = sqlite3.connect(self.db_path)
         connection.row_factory = sqlite3.Row
         try:
-            sql_statement = "SELECT id, title, price FROM books WHERE price >= ? ORDER BY price DESC, id ASC LIMIT ?"
+            sql_statement = """
+            SELECT id, title, price 
+            FROM books 
+            WHERE price >= ? 
+            ORDER BY price DESC, id ASC 
+            LIMIT ?
+            """
             rows = connection.execute(sql_statement, (min_price, limit)).fetchall()
             logger.debug(f"Retrieved {len(rows)} books")
             return [dict(row) for row in rows]
         finally:
             connection.close()
+    def replace_books(self, books):
+        connection = sqlite3.connect(self.db_path)
+        try:
+            sql_statement = "DELETE FROM books"
+            connection.execute(sql_statement)
+            sql_statement = "INSERT INTO books (title, price) VALUES (?, ?)"
+            connection.executemany(sql_statement, books)
+            connection.commit()
+            logger.debug(f"Replaced books: rows={len(books)}")
+        except sqlite3.Error:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+    def search_books(self, min_price, max_price):
+        connection = sqlite3.connect(self.db_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            # TODO: SELECT * from books.
+            # Use WHERE to filter prices within a specific range. You can use AND to combine the two conditions.
+            # Use ORDER BY to sort by price descending, then by ID ascending.
+            # Fetch all matching rows and return a list of dictionaries.
+            # Log the returned row count at DEBUG.
+            sql_statement = """
+            SELECT id, title, price 
+            FROM books 
+            WHERE price >= ? 
+            AND price <= ? 
+            ORDER BY price DESC, id ASC
+            """
+            rows = connection.execute(sql_statement, (min_price, max_price)).fetchall()
+            logger.debug(f"Retrieved {len(rows)} books")
+            return [dict(row) for row in rows]
+        finally:
+            connection.close()
+
 
 
 def main():
@@ -144,6 +202,10 @@ def main():
     print(storage.get_book(book_id)["price"])
     books = storage.list_books(min_price=15, limit=2)
     print([(book["title"], book["price"]) for book in books])
+    try:
+        storage.replace_books([("New Book", 20.0), (None, 10.0)])
+    except sqlite3.IntegrityError:
+        print("Replacement failed; original books kept.")
 
 
 if __name__ == "__main__":
